@@ -273,22 +273,42 @@ alias claude-kimi='ANTHROPIC_BASE_URL="http://localhost:8082" ANTHROPIC_AUTH_TOK
 **Usage:**
 
 ```bash
-# Launch with default model
+# Launch with default model (adds custom slot to model picker)
 fcc-run
 
-# Launch with specific model
+# Launch with specific model (adds custom slot)
 fcc-run --model opus      # Use MODEL_OPUS from .env
 fcc-run --model sonnet    # Use MODEL_SONNET from .env
 fcc-run --model haiku     # Use MODEL_HAIKU from .env
 fcc-run --model custom    # Use MODEL from .env
+
+# Override mode: replace official Claude models with free models
+fcc-run --override         # Override all models with default
+fcc-run --override opus    # Override Opus with free model
+fcc-run --override sonnet  # Override Sonnet with free model
+fcc-run --override haiku   # Override Haiku with free model
 ```
+
+**Two modes:**
+
+1. **Custom Slot Mode (default)**: Adds a custom model option to the `/model` picker
+   - You can switch between free and official models using `/model`
+   - Official models use your regular API credentials (if configured)
+   - Free models use the proxy
+
+2. **Override Mode (`--override`)**: Replaces official Claude models with free models
+   - All requests to Opus/Sonnet/Haiku go through the free API
+   - No way to switch back to official models in the same session
+   - Use this if you want to use only the free API
 
 **How it works:**
 1. Checks if proxy is already running using a lock file (`~/.config/free-claude-code/proxy.lock`)
 2. If not running, starts the proxy in the background and acquires the lock
 3. Sets `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` automatically
-4. Launches Claude Code with the selected model
-5. Displays the actual model name (e.g., `z-ai/glm4.7`) instead of generic names like "Opus"
+4. In custom slot mode: sets `ANTHROPIC_CUSTOM_MODEL_OPTION*` env vars
+5. In override mode: sets `ANTHROPIC_DEFAULT_*_MODEL_NAME*` env vars
+6. Launches Claude Code with the selected model
+7. Displays the actual model name (e.g., `z-ai/glm4.7`) instead of generic names like "Opus"
 
 **Multi-session support:**
 - The lock file prevents multiple proxy instances from contending for the same port
@@ -315,10 +335,12 @@ Edit `~/.config/free-claude-code/.env` with your API keys and model names, then:
 
 ```bash
 # Use from ANY directory - no need to be in the repo
-fcc-run                    # Launch Claude with default model
-fcc-run --model opus       # Launch Claude with Opus model
-fcc-run --model sonnet     # Launch Claude with Sonnet model
-fcc-run --model haiku      # Launch Claude with Haiku model
+fcc-run                    # Launch Claude with default model (custom slot mode)
+fcc-run --model opus       # Launch Claude with Opus model (custom slot mode)
+fcc-run --model sonnet     # Launch Claude with Sonnet model (custom slot mode)
+fcc-run --model haiku      # Launch Claude with Haiku model (custom slot mode)
+fcc-run --override         # Override all models with free API
+fcc-run --override opus    # Override Opus with free model
 ```
 
 **To update:**

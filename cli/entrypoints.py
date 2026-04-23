@@ -115,11 +115,15 @@ def run() -> None:
     """Start proxy in background and launch Claude Code (registered as `fcc-run`).
 
     Usage:
-        fcc-run                    # Launch Claude with default model
-        fcc-run --model opus       # Launch Claude with Opus model
-        fcc-run --model sonnet     # Launch Claude with Sonnet model
-        fcc-run --model haiku      # Launch Claude with Haiku model
+        fcc-run                    # Launch Claude with default model (adds custom slot)
+        fcc-run --model opus       # Launch Claude with Opus model (adds custom slot)
+        fcc-run --model sonnet     # Launch Claude with Sonnet model (adds custom slot)
+        fcc-run --model haiku      # Launch Claude with Haiku model (adds custom slot)
         fcc-run --model custom     # Launch Claude with custom model (set MODEL in .env)
+        fcc-run --override         # Override Claude models instead of adding custom slot
+        fcc-run --override opus    # Override Opus with free model
+        fcc-run --override sonnet  # Override Sonnet with free model
+        fcc-run --override haiku   # Override Haiku with free model
     """
     from config.settings import get_settings
 
@@ -187,7 +191,24 @@ def run() -> None:
 
     model = None
     model_display_name = None
-    if "--model" in sys.argv:
+    override_mode = False
+
+    # Check for --override flag
+    if "--override" in sys.argv:
+        override_mode = True
+        idx = sys.argv.index("--override")
+        # Check if a model is specified after --override
+        if idx + 1 < len(sys.argv) and not sys.argv[idx + 1].startswith("--"):
+            model_arg = sys.argv[idx + 1].lower()
+            model = model_map.get(model_arg, settings.model)
+            if model_arg not in model_map and model_arg != "custom":
+                print(f"Unknown model '{model_arg}', using default")
+                model = settings.model
+            model_display_name = model_arg
+        else:
+            model = settings.model
+            model_display_name = "default"
+    elif "--model" in sys.argv:
         idx = sys.argv.index("--model")
         if idx + 1 < len(sys.argv):
             model_arg = sys.argv[idx + 1].lower()
@@ -217,8 +238,40 @@ def run() -> None:
     env["ANTHROPIC_BASE_URL"] = proxy_url
     env["ANTHROPIC_AUTH_TOKEN"] = f"{auth_token}:{model}" if model else auth_token
 
-    print(f"Model mapping: {model_display_name} → {actual_model_name}")
-    print(f"Launching Claude Code with model: {actual_model_name}")
+    if override_mode:
+        # Override mode: use ANTHROPIC_DEFAULT_*_MODEL_NAME to override built-in models
+        # This makes the free model appear as the official model
+        if model_display_name == "opus":
+            env["ANTHROPIC_DEFAULT_OPUS_MODEL_NAME"] = actual_model_name
+            env["ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION"] = f"Free API ({actual_model_name})"
+        elif model_display_name == "sonnet":
+            env["ANTHROPIC_DEFAULT_SONNET_MODEL_NAME"] = actual_model_name
+            env["ANTHROPIC_DEFAULT_SONNET_MODEL_DESCRIPTION"] = f"Free API ({actual_model_name})"
+        elif model_display_name == "haiku":
+            env["ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME"] = actual_model_name
+            env["ANTHROPIC_DEFAULT_HAIKU_MODEL_DESCRIPTION"] = f"Free API ({actual_model_name})"
+        else:
+            # Default override - override all tiers
+            env["ANTHROPIC_DEFAULT_OPUS_MODEL_NAME"] = actual_model_name
+            env["ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION"] = f"Free API ({actual_model_name})"
+            env["ANTHROPIC_DEFAULT_SONNET_MODEL_NAME"] = actual_model_name
+            env["ANTHROPIC_DEFAULT_SONNET_MODEL_DESCRIPTION"] = f"Free API ({actual_model_name})"
+            env["ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME"] = actual_model_name
+            env["ANTHROPIC_DEFAULT_HAIKU_MODEL_DESCRIPTION"] = f"Free API ({actual_model_name})"
+
+        print(f"Override mode: {model_display_name} → {actual_model_name}")
+        print(f"Official Claude models will use free API")
+    else:
+        # Custom slot mode: add a custom model option to the picker
+        # This allows switching between free and official models
+        env["ANTHROPIC_CUSTOM_MODEL_OPTION"] = actual_model_name
+        env["ANTHROPIC_CUSTOM_MODEL_OPTION_NAME"] = f"{actual_model_name} (Free)"
+        env["ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION"] = f"Free API via proxy"
+
+        print(f"Custom slot mode: {model_display_name} → {actual_model_name}")
+        print(f"Use /model to switch between free and official models")
+
+    print(f"Launching Claude Code...")
     print("Press Ctrl+C to exit")
 
     # Launch Claude Code
