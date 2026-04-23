@@ -299,45 +299,49 @@ fcc-run --model custom    # Use MODEL from .env
 
 </details>
 
-### Use from Cloned Repo (development mode)
+### Install as a Package (recommended - works from any directory)
 
-If you've cloned the repository, you can use `fcc-run` directly without installing as a package:
-
-```bash
-# From the repo root directory
-uv run python -m cli.entrypoints run
-uv run python -m cli.entrypoints run --model opus
-uv run python -m cli.entrypoints run --model sonnet
-uv run python -m cli.entrypoints run --model haiku
-```
-
-Or create an alias in your `~/.zshrc` or `~/.bashrc`:
+Install the package globally using `uv tool install`. This makes `fcc-run` available from any directory:
 
 ```bash
-alias fcc-run="uv run python -m cli.entrypoints run"
-```
-
-Then reload your shell and run `fcc-run` directly.
-
-### Install as a Package (no clone needed)
-
-```bash
+# Install the package
 uv tool install git+https://github.com/tho-kn/free-claude-code.git
-fcc-init        # creates ~/.config/free-claude-code/.env from the built-in template
+
+# Initialize config (creates ~/.config/free-claude-code/.env)
+fcc-init
 ```
 
 Edit `~/.config/free-claude-code/.env` with your API keys and model names, then:
 
 ```bash
-# Option 1: One-command launch (recommended)
+# Use from ANY directory - no need to be in the repo
 fcc-run                    # Launch Claude with default model
 fcc-run --model opus       # Launch Claude with Opus model
-
-# Option 2: Manual server start
-free-claude-code           # starts the server
+fcc-run --model sonnet     # Launch Claude with Sonnet model
+fcc-run --model haiku      # Launch Claude with Haiku model
 ```
 
-> To update: `uv tool upgrade free-claude-code`
+**To update:**
+```bash
+uv tool upgrade free-claude-code
+```
+
+**To uninstall:**
+```bash
+uv tool uninstall free-claude-code
+```
+
+### Use from Cloned Repo (development mode)
+
+If you've cloned the repository and want to use it without installing as a package:
+
+```bash
+# From the repo root directory only
+uv run python -m cli.entrypoints run
+uv run python -m cli.entrypoints run --model opus
+```
+
+**Note:** This only works from the repo root directory. For global access, install as a package instead.
 
 ---
 
