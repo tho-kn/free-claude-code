@@ -331,6 +331,25 @@ uv tool upgrade free-claude-code
 uv tool uninstall free-claude-code
 ```
 
+### Install from Cloned Repository
+
+If you've cloned the repository and want to install the current branch (e.g., `fcc-run-improvements`):
+
+```bash
+# From the repo root directory
+uv tool install .
+
+# Initialize config
+fcc-init
+```
+
+This installs the package from your local clone, using the current branch. After installation, `fcc-run` will be available from any directory.
+
+**To reinstall after changes:**
+```bash
+uv tool reinstall free-claude-code
+```
+
 ### Use from Cloned Repo (development mode)
 
 If you've cloned the repository and want to use it without installing as a package:
