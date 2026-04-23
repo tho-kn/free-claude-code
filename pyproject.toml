@@ -26,6 +26,7 @@ dependencies = [
 [project.scripts]
 free-claude-code = "cli.entrypoints:serve"
 fcc-init = "cli.entrypoints:init"
+fcc-run = "cli.entrypoints:run"
 
 [project.optional-dependencies]
 voice = [

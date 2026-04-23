@@ -30,6 +30,7 @@ A lightweight proxy that routes Claude Code's Anthropic API calls to **NVIDIA NI
 | Feature                    | Description                                                                                     |
 | -------------------------- | ----------------------------------------------------------------------------------------------- |
 | **Zero Cost**              | 40 req/min free on NVIDIA NIM. Free models on OpenRouter. Fully local with LM Studio            |
+| **One-Command Launch**     | `fcc-run` starts proxy in background and launches Claude Code automatically                    |
 | **Drop-in Replacement**    | Set 2 env vars. No modifications to Claude Code CLI or VSCode extension needed                  |
 | **5 Providers**            | NVIDIA NIM, OpenRouter, DeepSeek, LM Studio (local), llama.cpp (`llama-server`)                  |
 | **Per-Model Mapping**      | Route Opus / Sonnet / Haiku to different models and providers. Mix providers freely             |
@@ -264,6 +265,40 @@ alias claude-kimi='ANTHROPIC_BASE_URL="http://localhost:8082" ANTHROPIC_AUTH_TOK
 
 </details>
 
+<details>
+<summary><b>One-Command Launch (fcc-run)</b></summary>
+
+`fcc-run` automatically starts the proxy in the background and launches Claude Code with the correct environment variables. No need to manage multiple terminals or set environment variables manually.
+
+**Usage:**
+
+```bash
+# Launch with default model
+fcc-run
+
+# Launch with specific model
+fcc-run --model opus      # Use MODEL_OPUS from .env
+fcc-run --model sonnet    # Use MODEL_SONNET from .env
+fcc-run --model haiku     # Use MODEL_HAIKU from .env
+fcc-run --model custom    # Use MODEL from .env
+```
+
+**How it works:**
+1. Checks if proxy is already running using a lock file (`~/.config/free-claude-code/proxy.lock`)
+2. If not running, starts the proxy in the background and acquires the lock
+3. Sets `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` automatically
+4. Launches Claude Code with the selected model
+5. Displays the actual model name (e.g., `z-ai/glm4.7`) instead of generic names like "Opus"
+
+**Multi-session support:**
+- The lock file prevents multiple proxy instances from contending for the same port
+- Multiple `fcc-run` commands will reuse the same running proxy
+- The proxy process runs in the background and continues after you exit Claude Code
+
+**Note:** The proxy lock file is automatically cleaned up when the proxy process exits. If the proxy crashes, you may need to manually remove the lock file at `~/.config/free-claude-code/proxy.lock`.
+
+</details>
+
 ### Install as a Package (no clone needed)
 
 ```bash
@@ -274,7 +309,12 @@ fcc-init        # creates ~/.config/free-claude-code/.env from the built-in temp
 Edit `~/.config/free-claude-code/.env` with your API keys and model names, then:
 
 ```bash
-free-claude-code    # starts the server
+# Option 1: One-command launch (recommended)
+fcc-run                    # Launch Claude with default model
+fcc-run --model opus       # Launch Claude with Opus model
+
+# Option 2: Manual server start
+free-claude-code           # starts the server
 ```
 
 > To update: `uv tool upgrade free-claude-code`
