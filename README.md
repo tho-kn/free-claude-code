@@ -143,6 +143,37 @@ MODEL="llamacpp/local-model"
 </details>
 
 <details>
+<summary><b>Codex CLI</b> (uses OpenAI ChatGPT subscription)</summary>
+
+Uses the OpenAI Codex CLI with your existing ChatGPT subscription. No separate API billing needed.
+
+```bash
+# Install Codex CLI
+npm install -g @openai/codex
+
+# Login to your OpenAI account
+codex login
+```
+
+```dotenv
+CODEX_CLI_MODEL="gpt-5.4"
+
+MODEL_OPUS="codex_cli/gpt-5.4"
+MODEL_SONNET="codex_cli/gpt-5.4"
+MODEL_HAIKU="codex_cli/gpt-5.4"
+MODEL="codex_cli/gpt-5.4"
+```
+
+**Available models:**
+- `gpt-5.4` - Latest GPT-5.4 model (recommended)
+- `gpt-5.3-codex` - Previous GPT-5.3 model
+- Other models available in your ChatGPT subscription
+
+**Note:** The Codex CLI handles authentication via OAuth. Your subscription credentials are used directly.
+
+</details>
+
+<details>
 <summary><b>Mix providers</b></summary>
 
 Each `MODEL_*` variable can use a different provider. `MODEL` is the fallback for unrecognized Claude models.
@@ -416,6 +447,7 @@ The proxy also exposes Claude-compatible probe routes: `GET /v1/models`, `POST /
 | **DeepSeek**   | Usage-based  | Varies     | Direct access to DeepSeek chat/reasoner |
 | **LM Studio**  | Free (local) | Unlimited  | Privacy, offline use, no rate limits |
 | **llama.cpp**  | Free (local) | Unlimited  | Lightweight local inference engine   |
+| **Codex CLI**  | Subscription | Varies     | OpenAI ChatGPT subscription integration |
 
 Models use a prefix format: `provider_prefix/model/name`. An invalid prefix causes an error.
 
@@ -426,6 +458,7 @@ Models use a prefix format: `provider_prefix/model/name`. An invalid prefix caus
 | DeepSeek   | `deepseek/...`    | `DEEPSEEK_API_KEY`   | `api.deepseek.com`            |
 | LM Studio  | `lmstudio/...`    | (none)               | `localhost:1234/v1`           |
 | llama.cpp  | `llamacpp/...`    | (none)               | `localhost:8080/v1`           |
+| Codex CLI  | `codex_cli/...`    | (none)               | (uses Codex CLI)              |
 
 <details>
 <summary><b>NVIDIA NIM models</b></summary>
@@ -491,6 +524,37 @@ Run models locally using `llama-server`. Ensure you have a tool-capable GGUF. Se
 
 See the Unsloth docs for detailed instructions and capable models:
 [https://unsloth.ai/docs/models/qwen3.5#qwen3.5-small-0.8b-2b-4b-9b](https://unsloth.ai/docs/models/qwen3.5#qwen3.5-small-0.8b-2b-4b-9b)
+
+</details>
+
+<details>
+<summary><b>Codex CLI models</b></summary>
+
+Codex CLI uses your OpenAI ChatGPT subscription. Available models depend on your subscription tier:
+
+- `gpt-5.4` - Latest GPT-5.4 model (recommended for Pro/Team users)
+- `gpt-5.3-codex` - Previous GPT-5.3 model
+- Other models available in your ChatGPT subscription
+
+**Setup:**
+```bash
+# Install Codex CLI
+npm install -g @openai/codex
+
+# Login to your OpenAI account
+codex login
+
+# Check available models
+codex --help
+```
+
+**Configuration:**
+```dotenv
+CODEX_CLI_MODEL="gpt-5.4"
+MODEL="codex_cli/gpt-5.4"
+```
+
+**Note:** The Codex CLI handles authentication via OAuth. Your subscription credentials are used directly, no separate API key needed.
 
 </details>
 

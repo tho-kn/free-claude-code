@@ -1,6 +1,7 @@
 """Providers package - implement your own provider by extending BaseProvider."""
 
 from .base import BaseProvider, ProviderConfig
+from .codex_cli import CodexCLIProvider
 from .deepseek import DeepSeekProvider
 from .exceptions import (
     APIError,
@@ -19,6 +20,7 @@ __all__ = [
     "APIError",
     "AuthenticationError",
     "BaseProvider",
+    "CodexCLIProvider",
     "DeepSeekProvider",
     "InvalidRequestError",
     "LMStudioProvider",

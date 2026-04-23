@@ -105,6 +105,12 @@ class Settings(BaseSettings):
         validation_alias="LLAMACPP_BASE_URL",
     )
 
+    # ==================== Codex CLI Config ====================
+    codex_cli_model: str = Field(
+        default="gpt-5.4",
+        validation_alias="CODEX_CLI_MODEL",
+    )
+
     # ==================== Model ====================
     # All Claude model requests are mapped to this single model (fallback)
     # Format: provider_type/model/name
@@ -234,6 +240,7 @@ class Settings(BaseSettings):
             "deepseek",
             "lmstudio",
             "llamacpp",
+            "codex_cli",
         )
         if "/" not in v:
             raise ValueError(
@@ -245,7 +252,7 @@ class Settings(BaseSettings):
         if provider not in valid_providers:
             raise ValueError(
                 f"Invalid provider: '{provider}'. "
-                f"Supported: 'nvidia_nim', 'open_router', 'deepseek', 'lmstudio', 'llamacpp'"
+                f"Supported: 'nvidia_nim', 'open_router', 'deepseek', 'lmstudio', 'llamacpp', 'codex_cli'"
             )
         return v
 
